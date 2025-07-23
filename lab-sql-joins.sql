@@ -29,12 +29,37 @@ GROUP BY name;
 
 # BONUS:
 # 5 Identify the film categories with the longest average running time.
+SELECT name, AVG(length)
+FROM film
+INNER JOIN film_category USING(film_id)
+INNER JOIN category USING(category_id)
+GROUP BY name
+ORDER BY AVG(length) DESC;
 
 # 6 Display the top 10 most frequently rented movies in descending order.
+SELECT title, COUNT(rental_id) AS times_rented
+FROM film
+INNER JOIN inventory USING(film_id)
+INNER JOIN RENTAL USING(inventory_id)
+GROUP BY title
+ORDER BY times_rented DESC
+LIMIT 10;
 
 # 7 Determine if "Academy Dinosaur" can be rented from Store 1.
+SELECT *
+FROM film
+INNER JOIN inventory USING(film_id)
+WHERE store_id = 1 AND title = "Academy Dinosaur";
+
 
 # 8 Provide a list of all distinct film titles, along with their availability status in the inventory. 
 # Include a column indicating whether each title is 'Available' or 'NOT available.' 
 # Note that there are 42 titles that are not in the inventory, 
 # and this information can be obtained using a CASE statement combined with IFNULL."
+SELECT DISTINCT title,
+CASE 
+WHEN inventory.film_id IS NULL THEN "Not Available"
+ELSE "Available"
+END AS "Availability Status"
+FROM film
+LEFT JOIN inventory USING(film_id);
