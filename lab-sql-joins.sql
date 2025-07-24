@@ -51,15 +51,34 @@ FROM film
 INNER JOIN inventory USING(film_id)
 WHERE store_id = 1 AND title = "Academy Dinosaur";
 
-
 # 8 Provide a list of all distinct film titles, along with their availability status in the inventory. 
 # Include a column indicating whether each title is 'Available' or 'NOT available.' 
 # Note that there are 42 titles that are not in the inventory, 
 # and this information can be obtained using a CASE statement combined with IFNULL."
 SELECT DISTINCT title,
-CASE 
-WHEN inventory.film_id IS NULL THEN "Not Available"
-ELSE "Available"
-END AS "Availability Status"
+	CASE 
+		WHEN inventory.film_id IS NULL THEN "Not Available"
+		ELSE "Available"
+	END AS availability_status
 FROM film
 LEFT JOIN inventory USING(film_id);
+
+# EXTRA Are there any customers who have never rented anything? If so, SELECT first name and last name
+SELECT first_name, last_name
+FROM customer
+WHERE customer_id NOT IN (SELECT customer_id FROM rental);
+
+SELECT CASE
+WHEN customer_id NOT IN (SELECT customer_id FROM rental) THEN first_name + last_name
+ELSE "All customers have rented at least once"
+END AS "Check inactive customers"
+FROM customer;
+
+# Show titles, duration and duration_category (short 60, 60-90 is medium, more than 90 is long)
+SELECT title, length,
+	CASE 
+		WHEN length < 60 THEN "short"
+		WHEN length BETWEEN 60 AND 90 THEN "medium"
+        WHEN length > 90 THEN "long"
+	END AS "duration_category"
+FROM film;
